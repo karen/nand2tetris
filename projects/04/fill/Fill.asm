@@ -10,5 +10,73 @@
 // When no key is pressed, the program clears the screen, i.e. writes
 // "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
+    
+    @curr // prev, curr = 0, 0
+    M=0
+    @prev
+    M=0
 
-// Put your code here.
+(LOOP)
+    @KBD
+    D=M
+    @SETFILL
+    D; JNE
+    @SETCLEAR
+    D; JEQ
+(RETURN1)
+    @SETSCREEN
+    D; JEQ
+    D=-1
+
+(SETCLEAR)
+    @curr
+    D=M
+    @prev // prev = curr
+    M=D
+    @curr // curr = CLEAR (0)
+    M=0
+    @RETURN1
+    0; JMP
+
+(SETFILL)
+    @curr
+    D=M
+    @prev
+    M=D
+    @curr
+    M=-1
+    @RETURN1
+    0; JMP
+
+(SETSCREEN)
+    @curr
+    D=M
+    @prev
+    D=D-M
+    @LOOP
+    D; JEQ // do not re-draw if they are the same
+
+    @SCREEN
+    D=A
+    @i
+    M=D
+
+(ITER)
+    @i
+    D=M
+    @KBD
+    D=D-A
+    @LOOP
+    D; JGE // stop once we reach @KBD
+
+    @curr
+    D=M
+    @i
+    A=M
+    M=D // draw
+
+    @i
+    M=M+1
+
+    @ITER
+    0; JMP
