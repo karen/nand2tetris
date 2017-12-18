@@ -25,8 +25,7 @@
     D; JEQ
 (RETURN1)
     @SETSCREEN
-    D; JEQ
-    D=-1
+    0; JMP
 
 (SETCLEAR)
     @curr
