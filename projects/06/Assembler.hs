@@ -111,8 +111,10 @@ padTo w x = go (w - length x) x where
 
 extractSymbols :: [String] -> [(String, Integer)]
 extractSymbols (x:xs) = go x xs 0 where
-    go _ [] i = []
-    go x (x':xs) i = if "(" `isPrefixOf` x then (stripSymbol x, i) : go x' xs i else go x' xs (i+1)
+    go _ [] _ = []
+    go x (x':xs) i = if "(" `isPrefixOf` x
+                        then (stripSymbol x, i) : go x' xs i
+                        else go x' xs (i+1)
 
 stripSymbol :: String -> String
 stripSymbol x = take (length x - 2) $ drop 1 x
@@ -129,16 +131,32 @@ stripTrailing x = inst where
         noComments = (splitOn "//" x) !! 0
         inst = filter (' '/=) noComments
 
+assignAddresses :: [String] -> Map String Integer -> [(String, Integer)]
+assignAddresses (x:xs) m = go x xs 16 where
+    go _ [] _ = []
+    go x (x':xs) i
+        | "@" `isPrefixOf` x && not (symbolExists symbol m) = (symbol, i) : go x' xs (i+1)
+        | otherwise = go x' xs i where
+            symbol = drop 1 x
+
+symbolExists :: String -> Map String Integer -> Bool
+symbolExists ls@(x:_) m = (Map.member ls m) || (Map.member ls symbols) || (ls `elem` destRegs) || (x `elem` ['0'..'9'])
+
 main :: IO ()
 main = do
     args <- getArgs
     content <- readFile (args !! 0)
     let asm = map stripTrailing $ filter commentsWhitespace (splitOn "\r\n" content)
-        symbolToInstNum = extractSymbols asm
+        jumpToAddr = extractSymbols asm
         initialTable = Map.empty :: Map String Integer
-        symbolTable = defineSymbols symbolToInstNum initialTable
-        parsed = parse asm symbolTable
+        jumpTable = defineSymbols jumpToAddr initialTable
+
+        varToAddr = assignAddresses asm jumpTable
+        userSymbolTable = defineSymbols varToAddr jumpTable
+        
+        parsed = parse asm userSymbolTable
         binary = translate parsed
+    mapM_ (putStrLn.show) varToAddr
     hdl <- openFile (args !! 1) WriteMode
     mapM_ (hPutStrLn hdl) binary
     hClose hdl
