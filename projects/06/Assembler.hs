@@ -12,7 +12,7 @@ import qualified Data.Map as Map
 
 instructionWidth = 16
 
-symbols :: Map String Int
+symbols :: Map String Integer
 symbols = Map.fromList ([("R" ++ show x, x) | x <- [0..15]] ++
                               [("SCREEN", 16384), ("KBD", 24576),
                                ("SP", 0), ("LCL", 1), ("ARG", 2),
@@ -36,23 +36,28 @@ destRegs = ["", "M", "D", "MD", "A", "AM", "AD", "AMD"]
 jumpCmds :: [String]
 jumpCmds = ["", "JGT", "JEQ", "JGE", "JLT", "JNE", "JLE", "JMP"]
 
-data Instruction = A String
+data Instruction = A Integer
                  | C (Maybe String) String (Maybe String)
                  deriving(Eq, Show)
 
-parse :: [String] -> [Maybe Instruction]
-parse x = filter (Nothing /=) $ map parseLine x
+parse :: [String] -> Map String Integer -> [Maybe Instruction]
+parse x m = filter (Nothing /=) $ map (parseLine m) x
 
-parseLine :: String -> Maybe Instruction
-parseLine x
+parseLine :: Map String Integer -> String -> Maybe Instruction
+parseLine m x
     | "//" `isPrefixOf` x = Nothing
-    | "@" `isPrefixOf` x = parseAInstruction x
+    | "@" `isPrefixOf` x = parseAInstruction m x
     | '=' `elem` x = parseAssignment x
     | ';' `elem` x = parseJump x
     | otherwise = Nothing
 
-parseAInstruction :: String -> Maybe Instruction
-parseAInstruction ('@': symb) = Just $ A symb
+parseAInstruction :: Map String Integer -> String -> Maybe Instruction
+parseAInstruction m ('@': symb) = Just $ A value where
+    value = case Map.lookup symb m of
+        Just addr -> addr
+        Nothing -> case Map.lookup symb symbols of
+            Just addr -> addr
+            Nothing -> read symb
 
 parseAssignment :: String -> Maybe Instruction
 parseAssignment x = Just $ C (Just dest) comp Nothing where
@@ -61,10 +66,10 @@ parseAssignment x = Just $ C (Just dest) comp Nothing where
     comp = parts !! 1
 
 parseJump :: String -> Maybe Instruction
-parseJump x = Just $ C Nothing symb (Just jmp) where
+parseJump x = Just $ C Nothing comp (Just jump) where
     parts = splitOn ";" x
-    symb = parts !! 0
-    jmp = parts !! 1
+    comp = parts !! 0
+    jump = parts !! 1
 
 translate :: [Maybe Instruction] -> [String]
 translate = map translateInstruction
@@ -73,12 +78,12 @@ translateInstruction :: Maybe Instruction -> String
 translateInstruction inst =
     case inst of
         Nothing -> error "Cannot translate empty Instruction"
-        Just (A val) -> "0" ++ padTo (instructionWidth - 1) (symbolToBinary val)
+        Just (A val) -> "0" ++ padTo (instructionWidth - 1) (intToBin val)
         Just (C (Just dest) comp Nothing) -> "111" ++ aRegCheck comp ++ compToBin comp ++ padTo 3 (destToBin dest) ++ "000"
         Just (C Nothing comp (Just jmp)) -> "111" ++ aRegCheck comp ++ compToBin comp ++ "000" ++ padTo 3 (jumpCmdToBin jmp)
 
 aRegCheck :: String -> String
-aRegCheck str = if 'M' `elem` str then "0" else "1"
+aRegCheck str = if 'M' `elem` str then "1" else "0"
 
 compToBin :: String -> String
 compToBin comp =
@@ -87,37 +92,52 @@ compToBin comp =
 
 destToBin :: String -> String
 destToBin x = case x `elemIndex` destRegs of
-    Just idx -> intToBin idx
+    Just idx -> intToBin (toInteger idx)
 
-intToBin :: Int -> String
+intToBin :: Integer -> String
 intToBin 0 = "0"
 intToBin x = go x [] where
     go 0 bin = bin
-    go x bin = go (x `div` 2) (intToDigit (x `mod` 2) : bin)
+    go x bin = go (x `div` 2) (intToDigit (fromIntegral (x `mod` 2)) : bin)
 
 jumpCmdToBin :: String -> String
 jumpCmdToBin x = case x `elemIndex` jumpCmds of
-    Just idx -> intToBin idx
-
-symbolToBinary :: String -> String
-symbolToBinary = intToBin . symbolToValue
-
-symbolToValue :: String -> Int
-symbolToValue sym = case Map.lookup sym symbols of
-    Just val -> val
-    Nothing -> read sym
+    Just idx -> intToBin (toInteger idx)
 
 padTo :: Int -> String -> String
 padTo w x = go (w - length x) x where
     go 0 x = x
     go n x = go (n - 1) ('0' : x)
 
+extractSymbols :: [String] -> [(String, Integer)]
+extractSymbols (x:xs) = go x xs 0 where
+    go _ [] i = []
+    go x (x':xs) i = if "(" `isPrefixOf` x then (stripSymbol x, i) : go x' xs i else go x' xs (i+1)
+
+stripSymbol :: String -> String
+stripSymbol x = take (length x - 2) $ drop 1 x
+
+defineSymbols :: [(String, Integer)] -> Map String Integer -> Map String Integer
+defineSymbols xs m = foldr go m xs where
+    go (key, val) m = Map.insert key val m
+
+commentsWhitespace :: String -> Bool
+commentsWhitespace x = (not (isPrefixOf "//" x) && (length x > 0))
+
+stripTrailing :: String -> String
+stripTrailing x = inst where
+        noComments = (splitOn "//" x) !! 0
+        inst = filter (' '/=) noComments
+
 main :: IO ()
 main = do
     args <- getArgs
     content <- readFile (args !! 0)
-    let asm = splitOn "\r\n" content
-        parsed = parse asm
+    let asm = map stripTrailing $ filter commentsWhitespace (splitOn "\r\n" content)
+        symbolToInstNum = extractSymbols asm
+        initialTable = Map.empty :: Map String Integer
+        symbolTable = defineSymbols symbolToInstNum initialTable
+        parsed = parse asm symbolTable
         binary = translate parsed
     hdl <- openFile (args !! 1) WriteMode
     mapM_ (hPutStrLn hdl) binary
