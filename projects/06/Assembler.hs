@@ -109,20 +109,6 @@ padTo w x = go (w - length x) x where
     go 0 x = x
     go n x = go (n - 1) ('0' : x)
 
-extractSymbols :: [String] -> [(String, Integer)]
-extractSymbols (x:xs) = go x xs 0 where
-    go _ [] _ = []
-    go x (x':xs) i = if "(" `isPrefixOf` x
-                        then (stripSymbol x, i) : go x' xs i
-                        else go x' xs (i+1)
-
-stripSymbol :: String -> String
-stripSymbol x = take (length x - 2) $ drop 1 x
-
-defineSymbols :: [(String, Integer)] -> Map String Integer -> Map String Integer
-defineSymbols xs m = foldr go m xs where
-    go (key, val) m = Map.insert key val m
-
 commentsWhitespace :: String -> Bool
 commentsWhitespace x = (not (isPrefixOf "//" x) && (length x > 0))
 
@@ -131,12 +117,23 @@ stripTrailing x = inst where
         noComments = (splitOn "//" x) !! 0
         inst = filter (' '/=) noComments
 
-assignAddresses :: [String] -> Map String Integer -> [(String, Integer)]
-assignAddresses (x:xs) m = go x xs 16 where
-    go _ [] _ = []
-    go x (x':xs) i
-        | "@" `isPrefixOf` x && not (symbolExists symbol m) = (symbol, i) : go x' xs (i+1)
-        | otherwise = go x' xs i where
+extractSymbols :: [String] -> Map String Integer -> Map String Integer
+extractSymbols (x:xs) m = go x xs 0 m where
+    go _ [] _ m = m
+    go x (x':xs) i m = if "(" `isPrefixOf` x
+                        then go x' xs i (Map.insert key i m)
+                        else go x' xs (i+1) m where
+                            key = stripSymbol x
+
+stripSymbol :: String -> String
+stripSymbol x = take (length x - 2) $ drop 1 x
+
+assignAddresses :: [String] -> Map String Integer -> Map String Integer
+assignAddresses (x:xs) m = go x xs 16 m where
+    go _ [] _ m = m
+    go x (x':xs) i m
+        | "@" `isPrefixOf` x && not (symbolExists symbol m) = go x' xs (i+1) (Map.insert symbol i m)
+        | otherwise = go x' xs i m where
             symbol = drop 1 x
 
 symbolExists :: String -> Map String Integer -> Bool
@@ -147,16 +144,10 @@ main = do
     args <- getArgs
     content <- readFile (args !! 0)
     let asm = map stripTrailing $ filter commentsWhitespace (splitOn "\r\n" content)
-        jumpToAddr = extractSymbols asm
-        initialTable = Map.empty :: Map String Integer
-        jumpTable = defineSymbols jumpToAddr initialTable
-
-        varToAddr = assignAddresses asm jumpTable
-        userSymbolTable = defineSymbols varToAddr jumpTable
-        
+        jumpTable = extractSymbols asm Map.empty
+        userSymbolTable = assignAddresses asm jumpTable
         parsed = parse asm userSymbolTable
         binary = translate parsed
-    mapM_ (putStrLn.show) varToAddr
     hdl <- openFile (args !! 1) WriteMode
     mapM_ (hPutStrLn hdl) binary
     hClose hdl
