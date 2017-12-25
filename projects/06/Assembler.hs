@@ -14,6 +14,7 @@ import qualified Data.Map as Map
 import Util
 
 instructionWidth = 16
+variableBaseAddr = 16
 
 symbols :: Map String Integer
 symbols = Map.fromList ([("R" ++ show x, x) | x <- [0..15]] ++
@@ -124,7 +125,7 @@ stripSymbol :: String -> String
 stripSymbol x = take (length x - 2) $ drop 1 x
 
 assignAddresses :: [String] -> Map String Integer -> Map String Integer
-assignAddresses (x:xs) m = go x xs 16 m where
+assignAddresses (x:xs) m = go x xs variableBaseAddr m where
     go _ [] _ m = m
     go x (x':xs) i m
         | "@" `isPrefixOf` x && not (symbolExists symbol m) = go x' xs (i+1) (Map.insert symbol i m)
