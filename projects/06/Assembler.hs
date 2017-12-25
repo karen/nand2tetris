@@ -4,11 +4,14 @@ module Main where
 
 import System.Environment
 import System.IO
+
 import Data.List.Split(splitOn)
 import Data.List(isPrefixOf, elemIndex)
 import Data.Map(Map)
 import Data.Char(intToDigit)
 import qualified Data.Map as Map
+
+import Util
 
 instructionWidth = 16
 
@@ -108,14 +111,6 @@ padTo :: Int -> String -> String
 padTo w x = go (w - length x) x where
     go 0 x = x
     go n x = go (n - 1) ('0' : x)
-
-commentsWhitespace :: String -> Bool
-commentsWhitespace x = (not (isPrefixOf "//" x) && (length x > 0))
-
-stripTrailing :: String -> String
-stripTrailing x = inst where
-        noComments = (splitOn "//" x) !! 0
-        inst = filter (' '/=) noComments
 
 extractSymbols :: [String] -> Map String Integer -> Map String Integer
 extractSymbols (x:xs) m = go x xs 0 m where
