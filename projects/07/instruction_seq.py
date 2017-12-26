@@ -78,7 +78,7 @@ class InstructionSeq():
         self.store_from("D")
         return self
 
-    def pointer_to_stack(self, index):
+    def pointer_to_stack(self, offset):
         """Push the value at THIS/THAT into the stack
         @THIS
         D=M
@@ -88,7 +88,7 @@ class InstructionSeq():
         D=M
         *SP=D
         """
-        source = "THIS" if index == "0" else "THAT"
+        source = MemorySegment.THIS if offset == "0" else MemorySegment.THAT
         self.a_instruction(source)
         self.c_instruction(dest="D", comp="M")
         self.dereference("SP")
@@ -137,7 +137,7 @@ class InstructionSeq():
         self.store_from("D")
         return self
 
-    def stack_to_pointer(self, target):
+    def stack_to_pointer(self, offset):
         """Pop the value from the stack and store it in the pointer segment
         @THIS
         M=*SP
@@ -145,7 +145,7 @@ class InstructionSeq():
         @THAT
         M=*SP
         """
-        target = "THIS" if offset == 0 else "THAT"
+        target = MemorySegment.THIS if offset == "0" else MemorySegment.THAT
         self.dereference("SP")
         self.c_instruction(dest="D", comp="M")
         self.a_instruction(target)
