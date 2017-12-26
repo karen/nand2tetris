@@ -18,7 +18,7 @@ if __name__ == '__main__':
     else:
         input_filename, output_filename = sys.argv[1], sys.argv[2]
         lines = open(input_filename, 'r').read().splitlines()
-        output = translate(lex(strip_comments(lines), input_filename))
+        output = translate(lex(strip_comments(lines), input_filename.split("/")[-1].split(".")[0]))
         with open(output_filename, 'w') as f:
             for line in output:
                 f.write(str(line) + "\n")

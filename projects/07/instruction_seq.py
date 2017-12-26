@@ -73,6 +73,7 @@ class InstructionSeq():
         *SP=D
         """
         self.a_instruction(filename + "." + offset)
+        self.c_instruction(dest="D", comp="M")
         self.dereference("SP")
         self.store_from("D")
         return self
