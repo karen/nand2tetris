@@ -15,6 +15,15 @@ class Command():
         m = Pop.regexp.search(inst)
         if m is not None:
             return Pop(m.groups(), filename)
+        m = Label.regexp.search(inst)
+        if m is not None:
+            return Label(m.groups(), filename)
+        m = Goto.regexp.search(inst)
+        if m is not None:
+            return Goto(m.groups(), filename)
+        m = IfGoto.regexp.search(inst)
+        if m is not None:
+            return IfGoto(m.groups(), filename)
         if inst == Add.cmd_name:
             return Add()
         elif inst == Sub.cmd_name:
@@ -158,3 +167,36 @@ class Gt(ComparisonCommand):
     cmd_name = "gt"
     def _assemble(self):
         return self.assemble("JGT")
+
+class BranchCommand(Command):
+    def __init__(self, groups, filename):
+        self.label = groups[0]
+        self.asm = None
+
+class Label(BranchCommand):
+    cmd_name = "label"
+    regexp = re.compile("label\s([\w\.]+)")
+
+    def _assemble(self):
+        return InstructionSeq("{} {}".format(self.cmd_name, self.label)) \
+                    .label(self.label)
+
+class Goto(BranchCommand):
+    cmd_name = "goto"
+    regexp = re.compile("^goto\s([\w\.]+)")
+
+    def _assemble(self):
+        return InstructionSeq("{} {}".format(self.cmd_name, self.label)) \
+                    .a_instruction(self.label) \
+                    .c_instruction(comp="0", jump="JMP")
+
+class IfGoto(BranchCommand):
+    cmd_name = "if-goto"
+    regexp = re.compile("if-goto\s([\w\.]+)")
+
+    def _assemble(self):
+        return InstructionSeq("{} {}".format(self.cmd_name, self.label)) \
+                    .dec_sp() \
+                    .stack_to_register("D") \
+                    .a_instruction(self.label) \
+                    .c_instruction(comp="D", jump="JNE")

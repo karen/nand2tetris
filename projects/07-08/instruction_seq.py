@@ -131,8 +131,7 @@ class InstructionSeq():
         @Filename.offset
         M=D
         """
-        self.dereference("SP")
-        self.c_instruction(dest="D", comp="M")
+        self.stack_to_register("D")
         self.a_instruction(filename + "." + offset)
         self.store_from("D")
         return self
@@ -146,8 +145,7 @@ class InstructionSeq():
         M=*SP
         """
         target = MemorySegment.THIS if offset == "0" else MemorySegment.THAT
-        self.dereference("SP")
-        self.c_instruction(dest="D", comp="M")
+        self.stack_to_register("D")
         self.a_instruction(target)
         self.store_from("D")
         return self
