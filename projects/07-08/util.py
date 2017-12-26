@@ -3,6 +3,9 @@ import os, re
 from enum import Enum
 
 COMMENT_RE = re.compile("\s*//.*$")
+R_ENDFRAME = "R13"
+R_RETADDR = "R14"
+R_TEMP = "R15"
 
 def generate_label(label):
     counter = -1

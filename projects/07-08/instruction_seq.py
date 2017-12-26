@@ -1,4 +1,4 @@
-from util import MemorySegment
+from util import *
 
 class InstructionSeq():
     def __init__(self, command=""):
@@ -188,6 +188,22 @@ class InstructionSeq():
         """Pushes a label into the instruction sequence
         """
         self.insts.append("(" + label + ")")
+        return self
+
+    def goto(self, label):
+        """Jumps to the specified label, unconditionally
+        """
+        self.a_instruction(self.label)
+        self.c_instruction(comp="0", jump="JMP")
+        return self
+
+    def dereference_endframe(self, target):
+        self.a_instruction(R_ENDFRAME)
+        self.c_instruction(dest="M", comp="M-1")
+        self.c_instruction(dest="A", comp="M")
+        self.c_instruction(dest="D", comp="M")
+        self.a_instruction(target)
+        self.store_from("D")
         return self
 
     def __str__(self):
