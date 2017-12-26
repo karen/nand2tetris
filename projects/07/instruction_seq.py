@@ -23,6 +23,21 @@ class InstructionSeq():
     def inc_sp(self):
         return self.a_instruction("SP").c_instruction(comp="M+1", dest="M")
 
+    def dereference(self, ptr):
+        """Dereference the given pointer so M is equal to *ptr
+        @ptr
+        A=M
+        """
+        self.a_instruction(ptr)
+        self.c_instruction(dest="A", comp="M")
+        return self
+
+    def store_from(self, reg):
+        """Stores the value from the "D" or "A" register
+        """
+        self.c_instruction(dest="M", comp=reg)
+        return self
+
     def const_to_stack(self, val):
         """Push a constant value on the stack
         @val
@@ -77,21 +92,6 @@ class InstructionSeq():
         self.c_instruction(dest="D", comp="M")
         self.dereference("SP")
         self.store_from("D")
-        return self
-
-    def dereference(self, ptr):
-        """Dereference the given pointer so M is equal to *ptr
-        @ptr
-        A=M
-        """
-        self.a_instruction(ptr)
-        self.c_instruction(dest="A", comp="M")
-        return self
-
-    def store_from(self, reg):
-        """Stores the value from the "D" or "A" register
-        """
-        self.c_instruction(dest="M", comp=reg)
         return self
 
     def stack_to_mem_seg(self, source, offset):
@@ -152,11 +152,22 @@ class InstructionSeq():
         return self
 
     def stack_to_register(self, reg):
+        """Peek into the stack. Places the value in the specified register.
+        """
         self.dereference("SP")
         self.c_instruction(dest=reg, comp="M")
         return self
 
-    def pop_and_push(self, comp):
+    def binary_op(self, comp):
+        """For a binary operation a `op` b:
+        SP--
+        D=b
+        SP--
+        *SP=a `op` b
+        SP++
+        """
+        self.dec_sp()
+        self.stack_to_register("D")
         self.dec_sp()
         self.dereference("SP")
         self.c_instruction(dest="M", comp=comp)
@@ -164,6 +175,10 @@ class InstructionSeq():
         return self
 
     def push(self, bool):
+        """Pushes a boolean value onto the stack.
+        True == -1
+        False == 0
+        """
         self.dereference("SP")
         comp = -1 if bool else 0
         self.c_instruction(dest="M", comp=str(comp))
@@ -171,6 +186,8 @@ class InstructionSeq():
         return self
 
     def label(self, label):
+        """Pushes a label into the instruction sequence
+        """
         self.insts.append("(" + label + ")")
         return self
 
