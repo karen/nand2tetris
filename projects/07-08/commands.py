@@ -260,25 +260,17 @@ class Call(Command):
         self.fxn_name, self.nargs = groups
         self._filename = filename
 
-        self.ra_label = generate_label("{}$ret.".format(self.fxn_name))
+    def _assemble(self):
+        return InstructionSeq("{} {} {}".format(self.cmd_name, self.fxn_name, self.nargs)) \
+                    .call(self.fxn_name, self.nargs)
+
+class Bootstrap(Command):
+    fxn_name = "Sys.init"
 
     def _assemble(self):
-        ret_addr_label = next(self.ra_label)
-        return InstructionSeq("{} {} {}".format(self.cmd_name, self.fxn_name, self.nargs)) \
-                    .push_address_to_stack(ret_addr_label, comp="A") \
-                    .push_address_to_stack(MemorySegment.LCL) \
-                    .push_address_to_stack(MemorySegment.ARG) \
-                    .push_address_to_stack(MemorySegment.THIS) \
-                    .push_address_to_stack(MemorySegment.THAT) \
-                    .a_instruction(5 + int(self.nargs)) \
+        return InstructionSeq("Bootstrap") \
+                    .a_instruction("256") \
                     .c_instruction(dest="D", comp="A") \
-                    .a_instruction("SP") \
-                    .c_instruction(dest="D", comp="M-D") \
-                    .a_instruction(MemorySegment.ARG) \
-                    .store_from("D") \
-                    .a_instruction("SP") \
-                    .c_instruction(dest="D", comp="M") \
-                    .a_instruction(MemorySegment.LCL) \
-                    .store_from("D") \
-                    .goto(self.fxn_name) \
-                    .label(ret_addr_label)
+                    .a_instruction("R0") \
+                    .c_instruction(dest="M", comp="D") \
+                    .call(Bootstrap.fxn_name, 0)

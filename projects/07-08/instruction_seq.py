@@ -1,6 +1,7 @@
 from util import *
 
 class InstructionSeq():
+    labelers = {}
     def __init__(self, command=""):
         self.insts = ["// " + command]
 
@@ -212,6 +213,32 @@ class InstructionSeq():
         self.c_instruction(dest="D", comp=comp)
         self.push_to_stack()
         self.inc_sp()
+        return self
+
+    def call(self, fxn_name, nargs):
+        if fxn_name in InstructionSeq.labelers:
+            labeler = InstructionSeq.labelers[fxn_name]
+        else:
+            labeler = generate_label("{}$ret.".format(fxn_name))
+            InstructionSeq.labelers[fxn_name] = labeler
+        label = next(labeler)
+        self.push_address_to_stack(label, comp="A")
+        self.push_address_to_stack(MemorySegment.LCL)
+        self.push_address_to_stack(MemorySegment.ARG)
+        self.push_address_to_stack(MemorySegment.THIS)
+        self.push_address_to_stack(MemorySegment.THAT)
+        self.a_instruction(5 + int(nargs))
+        self.c_instruction(dest="D", comp="A")
+        self.a_instruction("SP")
+        self.c_instruction(dest="D", comp="M-D")
+        self.a_instruction(MemorySegment.ARG)
+        self.store_from("D")
+        self.a_instruction("SP")
+        self.c_instruction(dest="D", comp="M")
+        self.a_instruction(MemorySegment.LCL)
+        self.store_from("D")
+        self.goto(fxn_name)
+        self.label(label)
         return self
 
     def __str__(self):

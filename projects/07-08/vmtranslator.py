@@ -21,7 +21,8 @@ def main(files, directory=''):
         print("Translating {}...".format(filename))
         lines = open(filename, 'r').read().splitlines()
         filename = dir_file_without_ext(files[0])[1]
-        all_output.append(translate(lex(strip_comments(lines), filename)))
+        commands = [cmd.Bootstrap()] + lex(strip_comments(lines), filename)
+        all_output.append(translate(commands))
 
     if directory:
         output_filename = get_output_name(directory=directory)
