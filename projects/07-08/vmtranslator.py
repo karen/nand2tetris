@@ -20,8 +20,8 @@ def main(files, directory=''):
     for filename in files:
         print("Translating {}...".format(filename))
         lines = open(filename, 'r').read().splitlines()
-        filename = dir_file_without_ext(files[0])[1]
-        commands = [cmd.Bootstrap()] + lex(strip_comments(lines), filename)
+        fname = dir_file_without_ext(filename)[1]
+        commands = [cmd.Bootstrap()] + lex(strip_comments(lines), fname)
         all_output.append(translate(commands))
 
     if directory:
