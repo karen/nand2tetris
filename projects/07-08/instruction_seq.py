@@ -38,6 +38,11 @@ class InstructionSeq():
         self.c_instruction(dest="M", comp=reg)
         return self
 
+    def push_to_stack(self, reg="D"):
+        self.dereference("SP")
+        self.store_from(reg)
+        return self
+
     def const_to_stack(self, val):
         """Push a constant value on the stack
         @val
@@ -46,8 +51,7 @@ class InstructionSeq():
         """
         self.a_instruction(val)
         self.c_instruction(dest="D", comp="A")
-        self.dereference("SP")
-        self.store_from("D")
+        self.push_to_stack()
         return self
 
     def mem_seg_to_stack(self, source, offset):
@@ -62,8 +66,7 @@ class InstructionSeq():
         self._offset_address(source, offset, type(source) == MemorySegment and source.is_ptr())
         self.c_instruction(dest="A", comp="D")
         self.c_instruction(dest="D", comp="M")
-        self.dereference("SP")
-        self.store_from("D")
+        self.push_to_stack()
         return self
 
     def static_to_stack(self, filename, offset):
@@ -74,8 +77,7 @@ class InstructionSeq():
         """
         self.a_instruction(filename + "." + offset)
         self.c_instruction(dest="D", comp="M")
-        self.dereference("SP")
-        self.store_from("D")
+        self.push_to_stack()
         return self
 
     def pointer_to_stack(self, offset):
@@ -91,8 +93,7 @@ class InstructionSeq():
         source = MemorySegment.THIS if offset == "0" else MemorySegment.THAT
         self.a_instruction(source)
         self.c_instruction(dest="D", comp="M")
-        self.dereference("SP")
-        self.store_from("D")
+        self.push_to_stack()
         return self
 
     def stack_to_mem_seg(self, source, offset):
