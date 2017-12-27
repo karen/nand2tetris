@@ -103,16 +103,16 @@ class InstructionSeq():
         D=A
         @offset
         D=A+D
-        @R15 (Store the address temporarily in R15)
+        @R_TEMP (Store the address temporarily in R_TEMP)
         M=D
         D=*SP
-        *R15=D
+        *R_TEMP=D
         """
         self._offset_address(source, offset, type(source) == MemorySegment and source.is_ptr())
-        self.a_instruction("R15")
+        self.a_instruction(R_TEMP)
         self.store_from("D")
         self.stack_to_register("D")
-        self.dereference("R15")
+        self.dereference(R_TEMP)
         self.store_from("D")
         return self
 
@@ -194,7 +194,7 @@ class InstructionSeq():
     def goto(self, label):
         """Jumps to the specified label, unconditionally
         """
-        self.a_instruction(self.label)
+        self.a_instruction(label)
         self.c_instruction(comp="0", jump="JMP")
         return self
 
@@ -205,6 +205,13 @@ class InstructionSeq():
         self.c_instruction(dest="D", comp="M")
         self.a_instruction(target)
         self.store_from("D")
+        return self
+
+    def push_address_to_stack(self, addr, comp="M"):
+        self.a_instruction(addr)
+        self.c_instruction(dest="D", comp=comp)
+        self.push_to_stack()
+        self.inc_sp()
         return self
 
     def __str__(self):

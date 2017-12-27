@@ -27,6 +27,9 @@ class Command():
         m = FunctionDef.regexp.search(inst)
         if m is not None:
             return FunctionDef(m.groups(), filename)
+        m = Call.regexp.search(inst)
+        if m is not None:
+            return Call(m.groups(), filename)
         if inst == Return.cmd_name:
             return Return()
         elif inst == Add.cmd_name:
@@ -245,5 +248,37 @@ class Return(Command):
                     .dereference_endframe(MemorySegment.THIS) \
                     .dereference_endframe(MemorySegment.ARG) \
                     .dereference_endframe(MemorySegment.LCL) \
-                    .a_instruction(R_RETADDR) \
-                    .c_instruction(dest="A", comp="M")
+                    .dereference(R_RETADDR) \
+                    .c_instruction(comp="0", jump="JMP")
+
+class Call(Command):
+    cmd_name = "call"
+    regexp = re.compile("call\s([\w\.]+)\s([\d\.]+)")
+
+    def __init__(self, groups, filename):
+        super().__init__()
+        self.fxn_name, self.nargs = groups
+        self._filename = filename
+
+        self.ra_label = generate_label("{}$ret.".format(self.fxn_name))
+
+    def _assemble(self):
+        ret_addr_label = next(self.ra_label)
+        return InstructionSeq("{} {} {}".format(self.cmd_name, self.fxn_name, self.nargs)) \
+                    .push_address_to_stack(ret_addr_label, comp="A") \
+                    .push_address_to_stack(MemorySegment.LCL) \
+                    .push_address_to_stack(MemorySegment.ARG) \
+                    .push_address_to_stack(MemorySegment.THIS) \
+                    .push_address_to_stack(MemorySegment.THAT) \
+                    .a_instruction(5 + int(self.nargs)) \
+                    .c_instruction(dest="D", comp="A") \
+                    .a_instruction("SP") \
+                    .c_instruction(dest="D", comp="M-D") \
+                    .a_instruction(MemorySegment.ARG) \
+                    .store_from("D") \
+                    .a_instruction("SP") \
+                    .c_instruction(dest="D", comp="M") \
+                    .a_instruction(MemorySegment.LCL) \
+                    .store_from("D") \
+                    .goto(self.fxn_name) \
+                    .label(ret_addr_label)
