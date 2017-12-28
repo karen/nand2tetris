@@ -65,9 +65,6 @@ class StackCommand(Command):
         self.source = MemorySegment.to_enum(target)
         self._filename = filename
 
-    def __repr__(self):
-        return "{} {} {}".format(self._cmd_name, self.source, self.offset)
-
 class Push(StackCommand):
     cmd_name = "push"
     regexp = re.compile("push\s([\w\.]+)\s([\w]+)")
@@ -131,6 +128,7 @@ class UnaryCommand(Command):
                     .dereference("SP") \
                     .c_instruction(dest="M", comp=comp) \
                     .inc_sp()
+
 class Neg(UnaryCommand):
     cmd_name = "neg"
     def _assemble(self):

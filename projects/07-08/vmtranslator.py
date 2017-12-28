@@ -29,6 +29,7 @@ def main(files, directory=''):
     else:
         parts = dir_file_without_ext(files[0])
         output_filename = get_output_name(file=parts)
+
     with open(output_filename, 'w') as f:
         for output in all_output:
             for line in output:

@@ -200,6 +200,9 @@ class InstructionSeq():
         return self
 
     def dereference_endframe(self, target):
+        """Set the value in the target register to be the value
+        given by the pointer ENDFRAME - 1.
+        """
         self.a_instruction(R_ENDFRAME)
         self.c_instruction(dest="M", comp="M-1")
         self.c_instruction(dest="A", comp="M")
@@ -209,6 +212,9 @@ class InstructionSeq():
         return self
 
     def push_address_to_stack(self, addr, comp="M"):
+        """Goes to the specified address and pushes the computation e.g. A or M
+        onto the stack.
+        """
         self.a_instruction(addr)
         self.c_instruction(dest="D", comp=comp)
         self.push_to_stack()
@@ -216,6 +222,14 @@ class InstructionSeq():
         return self
 
     def call(self, fxn_name, nargs):
+        """Handles calling of a given function with the specified name
+        and number of arguments.
+        1. Save return address, pointers of memory segments
+        2. Reposition the ARG pointer
+        3. Reposition the LCL pointer
+        4. Jump to the correct function
+        5. Add a label for the return address
+        """
         if fxn_name in InstructionSeq.labelers:
             labeler = InstructionSeq.labelers[fxn_name]
         else:
