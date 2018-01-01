@@ -13,7 +13,7 @@ BI_TYPES = ['void', 'int', 'char', 'boolean']
 
 class TokenType(Enum):
     KEYWORD = ('class|constructor|function|method|field|static|var|int'
-               '|char|boolean|void|true|false|null|this|let|do|if|else'
+               '|char|boolean|void|true|false|null|this|let|do(?!\w)|if|else'
                '|while|return')
     SYMBOL = '[' + re.escape('{}()[].,;+-*/&|<>=-~') + ']'
     IDENTIFIER = '[A-Za-z_][\w\d_]*'
