@@ -65,7 +65,7 @@ class Parser:
 
     def compileSubroutine(self):
         fxn_kind = self.expect(TokenType.KEYWORD, FXN_KEYWORDS)
-        self.local_state['return_type'] = self.compileType()
+        self.compileType()
         fxn_name = self.expect(TokenType.IDENTIFIER)
         self.expect(TokenType.SYMBOL, "(")
         self.compileParameterList()
@@ -201,9 +201,8 @@ class Parser:
         self.expect(TokenType.KEYWORD, "return")
         if not self.peek(TokenType.SYMBOL, ";"):
             self.compileExpression()
-        if self.local_state.get('return_type', None) == 'void':
+        else:
             self.writer.int_const(0)
-            del self.local_state['return_type']
         self.writer.ret()
         self.expect(TokenType.SYMBOL, ";")
 
