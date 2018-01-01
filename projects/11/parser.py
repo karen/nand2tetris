@@ -59,7 +59,6 @@ class Parser:
             varlist.append((name, taipu, kind))
         for entry in varlist:
             self.st_handler.define(*entry)
-        return len(varlist)
 
     def compileSubroutine(self):
         fxn_kind = self.expect(TokenType.KEYWORD, FXN_KEYWORDS)
@@ -71,22 +70,18 @@ class Parser:
         self.compileSubroutineBody(fxn_name, fxn_kind)
 
     def compileParameterList(self):
-        nvars = 0
         if not self.peek(TokenType.SYMBOL, ")"):
             kind = IdentifierKind.ARGUMENT
             taipu = self.compileType()
             name = self.expect(TokenType.IDENTIFIER)
             self.st_handler.define(name, taipu, kind)
-            nvars += 1
-            nvars += self.tryCompileVarList(exp_type=True, kind=kind)
-        return nvars
+            self.tryCompileVarList(exp_type=True, kind=kind)
 
     def compileSubroutineBody(self, fxn_name, fxn_kind):
         self.expect(TokenType.SYMBOL, "{")
         while self.peek(TokenType.KEYWORD, "var"):
             self.compileVarDec()
-        nlocs = self.st_handler.var_count(IdentifierKind.VAR)
-        self.writer.fun_dec(fxn_name, nlocs)
+        self.writer.fun_dec(fxn_name, self.st_handler.var_count(IdentifierKind.VAR))
         self.compileFxnKind(fxn_kind)
         self.compileStatements()
         self.expect(TokenType.SYMBOL, "}")
@@ -102,15 +97,13 @@ class Parser:
             self.writer.pop_this_ptr()
 
     def compileVarDec(self):
-        nvars = 1
         self.expect(TokenType.KEYWORD, "var")
         kind = IdentifierKind.VAR
         taipu = self.compileType()
         name = self.expect(TokenType.IDENTIFIER)
         self.st_handler.define(name, taipu, kind)
-        nvars += self.tryCompileVarList(taipu=taipu, kind=kind)
+        self.tryCompileVarList(taipu=taipu, kind=kind)
         self.expect(TokenType.SYMBOL, ";")
-        return nvars
 
     def compileStatements(self):
         while self.peek(TokenType.KEYWORD, STMT_KEYWORDS):
@@ -131,28 +124,33 @@ class Parser:
     def compileLet(self):
         self.expect(TokenType.KEYWORD, "let")
         var = self.expect(TokenType.IDENTIFIER)
-        arr_to_arr = False
+        array_assignment = False
         if self.peek(TokenType.SYMBOL, "["):
-            arr_to_arr = True
-            self.writer.push_variable(var, self.st_handler)
-            self.expect(TokenType.SYMBOL, "[")
-            self.compileExpression()
-            self.expect(TokenType.SYMBOL, "]")
-            self.writer.binary_op("+")
+            array_assignment = True
+            self.compileBasePlusOffset(var)
         self.expect(TokenType.SYMBOL, "=")
-        if self.peek(TokenType.SYMBOL, "["):
-            arr_to_arr &= True
-        else:
-            arr_to_arr &= False
         self.compileExpression()
         self.expect(TokenType.SYMBOL, ";")
-        if arr_to_arr:
-            self.writer.pop('temp', 0)
-            self.writer.pop_that_ptr()
-            self.writer.push('temp', 0)
-            self.writer.pop_that()
+        if array_assignment:
+            self.saveToTemp()
+            self.popToArray()
         else:
             self.writer.pop_variable(var, self.st_handler)
+
+    def compileBasePlusOffset(self, base):
+        self.writer.push_variable(base, self.st_handler)
+        self.expect(TokenType.SYMBOL, "[")
+        self.compileExpression()
+        self.expect(TokenType.SYMBOL, "]")
+        self.writer.binary_op("+")
+
+    def saveToTemp(self):
+        self.writer.pop('temp', 0)
+
+    def popToArray(self):
+        self.writer.pop_that_ptr()
+        self.writer.push('temp', 0)
+        self.writer.pop_that()
 
     def compileIf(self):
         self.expect(TokenType.KEYWORD, "if")
@@ -162,11 +160,6 @@ class Parser:
             self.expect(TokenType.KEYWORD, "else")
             self.expectBracedStatements()
         self.writer.label(endif)
-
-    def expectGroupedExpression(self):
-        self.expect(TokenType.SYMBOL, "(")
-        self.compileExpression()
-        self.expect(TokenType.SYMBOL, ")")
 
     def expectBracedStatements(self):
         self.expect(TokenType.SYMBOL, "{")
@@ -187,6 +180,11 @@ class Parser:
         self.expectBracedStatements()
         self.writer.goto(ret)
         self.writer.label(not_cond)
+
+    def expectGroupedExpression(self):
+        self.expect(TokenType.SYMBOL, "(")
+        self.compileExpression()
+        self.expect(TokenType.SYMBOL, ")")
 
     def compileDo(self):
         self.expect(TokenType.KEYWORD, "do")
@@ -268,7 +266,9 @@ class Parser:
         self.writer.call(qualified_name, nargs)
 
     def compileMethodCall(self, caller):
+        nargs = 0
         if self.st_handler.is_object(caller):
+            nargs += 1
             self.writer.push_variable(caller, self.st_handler)
         self.expect(TokenType.SYMBOL, ".")
         method = self.expect(TokenType.IDENTIFIER)

@@ -73,6 +73,9 @@ class VMCodeWriter:
         self.pop('pointer', '1')
 
     def push_that(self):
+        self.push('that', '0')
+
+    def pop_that(self):
         self.pop('that', '0')
 
     def label(self, l):
