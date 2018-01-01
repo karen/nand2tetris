@@ -9,7 +9,7 @@ class Parser:
         self.in_name, self.out_name = f
         self.output = []
         self.tokeniser = Tokeniser(f)
-        self.st_handler = None
+        self.st_handler = SymbolTable()
         self.writer = VMCodeWriter(f)
         self.local_state = {'labeler': labeler()}
         self.parse()
@@ -22,12 +22,10 @@ class Parser:
 
     def compileClass(self):
         self.expect(TokenType.KEYWORD, 'class')
-        klass = self.expect(TokenType.IDENTIFIER)
-        self.st_handler = SymbolTable(klass)
-        self.local_state['class'] = klass
+        self.local_state['class'] = self.expect(TokenType.IDENTIFIER)
         self.expect(TokenType.SYMBOL, '{')
         while self.peek(TokenType.KEYWORD, CLASS_VAR_KEYWORDS):
-            entry = self.compileClassVarDec()
+            self.compileClassVarDec()
         while self.peek(TokenType.KEYWORD, FXN_KEYWORDS):
             self.st_handler.start_subroutine()
             self.compileSubroutine()

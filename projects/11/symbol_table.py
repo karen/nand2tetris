@@ -3,8 +3,7 @@ from util import BI_TYPES, IdentifierKind
 
 class SymbolTable:
     Entry = namedtuple('Entry', ['type', 'kind', 'id'])
-    def __init__(self, klass):
-        self.klass = klass
+    def __init__(self):
         self.class_table = {}
         self.subroutine_table = {}
         self.curr_scope = self.class_table
