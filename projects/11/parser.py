@@ -247,23 +247,23 @@ class Parser:
         self.writer.unary_op(op)
 
     def compileArrayAccess(self, arr):
-        self.writer.push_variable(arr, self.st_handler)
-        self.expect(TokenType.SYMBOL, "[")
-        self.compileExpression()
-        self.expect(TokenType.SYMBOL, "]")
-        self.writer.binary_op("+")
+        self.compileBasePlusOffset(arr)
         self.writer.pop_that_ptr()
         self.writer.push_that()
 
     def compileSubroutineCall(self, caller):
         if self.peek(TokenType.SYMBOL, "("):
-            method = caller
-            self.writer.push_this_ptr()
-            nargs = self.expectExpressionList() + 1
+            method, nargs = self.compileSelfFunctionCall(caller)
+            qualified_name = self.local_state['class'] + '.' + method
         elif self.peek(TokenType.SYMBOL, "."):
             method, nargs = self.compileMethodCall(caller)
-        qualified_name = self.st_handler.qualify(caller, method)
+            qualified_name = self.st_handler.qualify(caller, method)
         self.writer.call(qualified_name, nargs)
+
+    def compileSelfFunctionCall(self, method):
+        self.writer.push_this_ptr()
+        nargs = self.expectExpressionList() + 1
+        return method, nargs
 
     def compileMethodCall(self, caller):
         nargs = 0
