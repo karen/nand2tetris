@@ -1,0 +1,367 @@
+function Screen.init 0
+push constant 16384
+pop static 0
+push static 2
+pop static 1
+push constant 1
+pop static 2
+push constant 0
+pop static 3
+push constant 0
+return  
+function Screen.clearScreen 1
+push constant 0
+pop local 0
+label LABEL1 
+push local 0
+push constant 8192
+lt  
+not  
+if-goto LABEL2 
+push static 0
+push local 0
+add  
+push static 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto LABEL1 
+label LABEL2 
+push constant 0
+return  
+function Screen.setColor 0
+push argument 0
+not  
+if-goto LABEL4 
+push static 2
+pop static 1
+goto LABEL3 
+label LABEL4 
+push static 3
+pop static 1
+label LABEL3 
+push constant 0
+return  
+function Screen.drawPixel 4
+push constant 32
+push argument 1
+call Math.multiply 2  
+push argument 0
+add  
+push constant 16
+call Math.divide 2  
+pop local 0
+push constant 16384
+push local 0
+add  
+call Memory.peek 1
+pop local 1
+push argument 0
+push constant 16
+call Math.mod 2
+pop local 2
+push local 2
+call Math.powerOfTwo 1
+pop local 3
+push local 1
+push local 3
+or  
+pop local 1
+push local 0
+push local 1
+call Memory.poke 2
+pop temp 0
+function Screen.drawLine 5
+push argument 0
+push argument 2
+sub  
+pop local 0
+push argument 1
+push argument 3
+sub  
+pop local 1
+push local 0
+push constant 0
+eq  
+not  
+if-goto LABEL6 
+push argument 0
+push argument 1
+push argument 3
+call Screen.drawVertical 3
+pop temp 0
+push constant 0
+return  
+goto LABEL5 
+label LABEL6 
+label LABEL5 
+push local 1
+push constant 0
+eq  
+not  
+if-goto LABEL8 
+push argument 0
+push argument 2
+push argument 1
+call Screen.drawHorizontal 3
+pop temp 0
+push constant 0
+return  
+goto LABEL7 
+label LABEL8 
+label LABEL7 
+push argument 0
+push argument 1
+push argument 2
+push argument 3
+call Screen.drawDiagonal 4
+pop temp 0
+push constant 0
+return  
+function Screen.drawDiagonal 6
+push argument 0
+push argument 2
+gt  
+not  
+if-goto LABEL10 
+push argument 2
+push argument 3
+push argument 0
+push argument 1
+call Screen.drawDiagonal 4
+pop temp 0
+push constant 0
+return  
+goto LABEL9 
+label LABEL10 
+label LABEL9 
+push argument 1
+push argument 3
+gt  
+not  
+if-goto LABEL12 
+push constant 1
+neg  
+pop local 2
+goto LABEL11 
+label LABEL12 
+push constant 1
+pop local 2
+label LABEL11 
+push argument 2
+push argument 0
+sub  
+pop local 0
+push argument 1
+push argument 3
+sub  
+pop local 1
+push constant 0
+pop local 3
+push constant 0
+pop local 4
+push constant 0
+pop local 5
+label LABEL13 
+push local 3
+push local 0
+gt  
+not  
+push local 2
+push constant 1
+eq  
+push local 4
+push local 1
+gt  
+not  
+and  
+push local 2
+push constant 1
+neg  
+eq  
+or  
+push local 4
+push local 1
+lt  
+not  
+and  
+and  
+not  
+if-goto LABEL14 
+push argument 0
+push local 3
+add  
+push argument 1
+push local 4
+add  
+call Screen.drawPixel 2
+pop temp 0
+push local 5
+push constant 0
+lt  
+not  
+if-goto LABEL16 
+push local 3
+push constant 1
+add  
+pop local 3
+push local 5
+push local 1
+add  
+pop local 5
+goto LABEL15 
+label LABEL16 
+push local 4
+push local 2
+add  
+pop local 4
+push local 5
+push local 0
+push local 2
+call Math.multiply 2  
+sub  
+pop local 5
+label LABEL15 
+goto LABEL13 
+label LABEL14 
+function Screen.drawVertical 0
+push argument 1
+push argument 2
+gt  
+not  
+if-goto LABEL18 
+push argument 0
+push argument 2
+push argument 1
+call Screen.drawVertical 3
+pop temp 0
+push constant 0
+return  
+goto LABEL17 
+label LABEL18 
+label LABEL17 
+label LABEL19 
+push argument 1
+push argument 2
+lt  
+not  
+if-goto LABEL20 
+push argument 0
+push argument 1
+call Screen.drawPixel 2
+pop temp 0
+push argument 1
+push constant 1
+add  
+pop argument 1
+goto LABEL19 
+label LABEL20 
+push constant 0
+return  
+function Screen.drawHorizontal 0
+push argument 0
+push argument 1
+gt  
+not  
+if-goto LABEL22 
+push argument 1
+push argument 0
+push argument 2
+call Screen.drawHorizontal 3
+pop temp 0
+push constant 0
+return  
+goto LABEL21 
+label LABEL22 
+label LABEL21 
+label LABEL23 
+push argument 0
+push argument 1
+lt  
+not  
+if-goto LABEL24 
+push argument 0
+push argument 2
+call Screen.drawPixel 2
+pop temp 0
+push argument 0
+push constant 1
+add  
+pop argument 0
+goto LABEL23 
+label LABEL24 
+push constant 0
+return  
+function Screen.drawRectangle 1
+push argument 1
+pop local 0
+label LABEL25 
+push local 0
+push argument 3
+gt  
+not  
+not  
+if-goto LABEL26 
+push argument 0
+push argument 2
+push local 0
+call Screen.drawHorizontal 3
+pop temp 0
+push local 0
+push constant 1
+add  
+pop local 0
+goto LABEL25 
+label LABEL26 
+push constant 0
+return  
+function Screen.drawCircle 4
+push argument 2
+call Math.abs 1
+pop argument 2
+push argument 2
+push argument 2
+call Math.multiply 2  
+pop local 2
+push argument 2
+neg  
+pop local 1
+label LABEL27 
+push local 1
+push argument 2
+gt  
+not  
+not  
+if-goto LABEL28 
+push local 1
+push local 1
+call Math.multiply 2  
+pop local 3
+push local 2
+push local 3
+sub  
+call Math.sqrt 1
+pop local 0
+push argument 0
+push local 0
+sub  
+push argument 1
+push local 1
+add  
+push argument 0
+push local 0
+add  
+push argument 1
+push local 1
+add  
+call Screen.drawLine 4
+pop temp 0
+push local 1
+push constant 1
+add  
+pop local 1
+goto LABEL27 
+label LABEL28 
+push constant 0
+return  
