@@ -11,10 +11,11 @@ FXN_KEYWORDS = ['constructor', 'function', 'method']
 CLASS_VAR_KEYWORDS = ['static', 'field']
 BI_TYPES = ['void', 'int', 'char', 'boolean']
 
+CONTORL_KEYWORDS = ['let', 'do', 'if', 'else', 'while', 'return']
+KEYWORDS = ['class', 'var'] + FXN_KEYWORDS + CLASS_VAR_KEYWORDS + BI_TYPES + KEYWORD_CONSTANTS + CONTORL_KEYWORDS
+
 class TokenType(Enum):
-    KEYWORD = ('class|constructor|function|method|field|static|var|int'
-               '|char|boolean|void|true|false|null|this|let|do(?!\w)|if|else'
-               '|while|return')
+    KEYWORD = '|'.join(keyword + r'(?!\w)' for keyword in KEYWORDS)
     SYMBOL = '[' + re.escape('{}()[].,;+-*/&|<>=-~') + ']'
     IDENTIFIER = '[A-Za-z_][\w\d_]*'
     INT_CONST = '\d+'
