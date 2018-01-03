@@ -30,6 +30,8 @@ add
 pop local 0
 goto LABEL1 
 label LABEL2 
+push constant 0
+return  
 function Math.abs 0
 push argument 0
 push constant 0
