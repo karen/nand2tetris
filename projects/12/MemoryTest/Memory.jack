@@ -1,0 +1,78 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+    static Array ram;
+    static Array heap;
+    static Array freeList;
+
+    /** Initializes the class. */
+    function void init() {
+        let ram = 0;
+        let heap = 2048;
+        let freeList = heap;
+        let heap[0] = 0;
+        let heap[1] = 14335;
+        return;     
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var int curr, prev, ans;
+        
+        let curr = freeList;
+        let prev = null;
+        while(curr[0] < size + 1) {
+            let prev = curr;
+            let curr = curr[1];
+        }
+        
+        if (curr[0] = size) {
+            if (prev = null) {
+                let freeList = curr[1];
+            } else {
+                let prev[1] = curr[1];    
+            }
+        } else {
+            let ans = curr + curr[0] - (size + 1) + 1;
+            let curr[0] = curr[0] - (size + 1);
+            let ans[-1] = size + 1;
+        }
+
+        return ans;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        var Array segment;
+        var int curr;
+
+        let segment = o - 1;
+        let segment[1] = null;
+        let curr = freeList;
+        while (~(curr[1] = null)) {
+            let curr = curr[1];
+        }
+        let curr[1] = segment;
+    }    
+}
