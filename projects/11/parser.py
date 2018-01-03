@@ -273,7 +273,7 @@ class Parser:
             self.writer.push_variable(caller, self.st_handler)
         self.expect(TokenType.SYMBOL, ".")
         method = self.expect(TokenType.IDENTIFIER)
-        nargs = self.expectExpressionList()
+        nargs += self.expectExpressionList()
         return method, nargs
         
     def expectExpressionList(self):
