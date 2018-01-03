@@ -62,6 +62,8 @@ class Parser:
 
     def compileSubroutine(self):
         fxn_kind = self.expect(TokenType.KEYWORD, FXN_KEYWORDS)
+        if fxn_kind == 'method':
+            self.st_handler.define('this', self.local_state['class'], IdentifierKind.ARGUMENT)
         self.compileType()
         fxn_name = self.expect(TokenType.IDENTIFIER)
         self.expect(TokenType.SYMBOL, "(")
@@ -92,7 +94,6 @@ class Parser:
             self.writer.alloc(num_fields)
             self.writer.pop_this_ptr()
         elif kind == 'method':
-            self.st_handler.define('this', self.local_state['class'], IdentifierKind.ARGUMENT)
             self.writer.push_variable('this', self.st_handler)
             self.writer.pop_this_ptr()
 
