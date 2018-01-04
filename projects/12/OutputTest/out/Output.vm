@@ -27,6 +27,8 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+call Output.initMap 0
+pop temp 0
 push constant 0
 return  
 function Output.initMap 1
@@ -510,15 +512,15 @@ push constant 0
 call Output.create 12
 pop temp 0
 push constant 65
-push constant 0
-push constant 0
-push constant 0
-push constant 0
-push constant 0
-push constant 0
-push constant 0
-push constant 0
-push constant 0
+push constant 12
+push constant 30
+push constant 51
+push constant 51
+push constant 63
+push constant 51
+push constant 51
+push constant 51
+push constant 51
 push constant 0
 push constant 0
 call Output.create 12
@@ -1507,6 +1509,8 @@ push argument 1
 pop static 1
 push argument 0
 pop static 2
+push constant 0
+return  
 function Output.printChar 5
 push argument 0
 call Output.getMap 1
@@ -1528,7 +1532,7 @@ pop local 3
 push constant 1
 pop local 4
 push local 3
-push constant 0
+push constant 1
 eq  
 not  
 if-goto LABEL4 
@@ -1601,13 +1605,13 @@ pop local 0
 label LABEL9 
 push local 0
 push argument 0
-call String.length 0
+call String.length 1
 lt  
 not  
 if-goto LABEL10 
 push argument 0
 push local 0
-call String.charAt 1
+call String.charAt 2
 call Output.printChar 1
 pop temp 0
 push local 0
@@ -1624,13 +1628,13 @@ call String.new 1
 pop local 0
 push local 0
 push argument 0
-call String.setInt 1
+call String.setInt 2
 pop temp 0
 push local 0
 call Output.printString 1
 pop temp 0
 push local 0
-call String.dispose 0
+call String.dispose 1
 pop temp 0
 push constant 0
 return  
