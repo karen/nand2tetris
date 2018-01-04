@@ -86,10 +86,10 @@ push that 0
 call Memory.poke 2
 pop temp 0
 push local 1
-call Array.dispose 0
+call Array.dispose 1
 pop temp 0
 push local 2
-call Array.dispose 0
+call Array.dispose 1
 pop temp 0
 push constant 3
 call Array.new 1
@@ -117,10 +117,10 @@ push that 0
 call Memory.poke 2
 pop temp 0
 push local 3
-call Array.dispose 0
+call Array.dispose 1
 pop temp 0
 push local 2
-call Array.dispose 0
+call Array.dispose 1
 pop temp 0
 push constant 0
 return  

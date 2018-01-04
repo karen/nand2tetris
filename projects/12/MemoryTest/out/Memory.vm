@@ -5,18 +5,22 @@ push constant 2048
 pop static 1
 push static 1
 pop static 2
-push static 1
 push constant 0
+pop static 3
+push constant 1
+pop static 4
+push static 2
+push static 3
 add  
-push constant 0
+push constant 14335
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 1
-push constant 1
+push static 2
+push static 4
 add  
-push constant 14335
+push constant 0
 pop temp 0
 pop pointer 1
 push temp 0
@@ -48,20 +52,28 @@ push constant 0
 pop local 1
 label LABEL1 
 push local 0
-push constant 0
+push static 3
 add  
 pop pointer 1
 push that 0
 push argument 0
-lt  
-push constant 1
+gt  
+not  
+push local 0
+push static 4
 add  
+pop pointer 1
+push that 0
+push constant 0
+eq  
+not  
+and  
 not  
 if-goto LABEL2 
 push local 0
 pop local 1
 push local 0
-push constant 1
+push static 4
 add  
 pop pointer 1
 push that 0
@@ -69,12 +81,15 @@ pop local 0
 goto LABEL1 
 label LABEL2 
 push local 0
-push constant 0
+push static 3
 add  
 pop pointer 1
 push that 0
 push argument 0
-eq  
+push constant 1
+add  
+gt  
+not  
 not  
 if-goto LABEL4 
 push local 1
@@ -83,7 +98,7 @@ eq
 not  
 if-goto LABEL6 
 push local 0
-push constant 1
+push static 4
 add  
 pop pointer 1
 push that 0
@@ -91,10 +106,10 @@ pop static 2
 goto LABEL5 
 label LABEL6 
 push local 1
-push constant 1
+push static 4
 add  
 push local 0
-push constant 1
+push static 4
 add  
 pop pointer 1
 push that 0
@@ -103,27 +118,22 @@ pop pointer 1
 push temp 0
 pop that 0
 label LABEL5 
-goto LABEL3 
-label LABEL4 
 push local 0
-push local 0
-push constant 0
+push static 3
 add  
 pop pointer 1
 push that 0
-add  
-push argument 0
 push constant 1
-add  
 sub  
-push constant 1
-add  
-pop local 2
+pop argument 0
+goto LABEL3 
+label LABEL4 
+label LABEL3 
 push local 0
-push constant 0
+push static 3
 add  
 push local 0
-push constant 0
+push static 3
 add  
 pop pointer 1
 push that 0
@@ -135,6 +145,16 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 0
+push local 0
+push static 3
+add  
+pop pointer 1
+push that 0
+add  
+push constant 1
+add  
+pop local 2
 push local 2
 push constant 1
 neg  
@@ -146,48 +166,35 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-label LABEL3 
 push local 2
 return  
-function Memory.deAlloc 2
+function Memory.deAlloc 1
 push argument 0
 push constant 1
 sub  
 pop local 0
 push local 0
-push constant 1
+push static 3
 add  
-push constant 0
+push argument 0
+push constant 1
+neg  
+add  
+pop pointer 1
+push that 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 2
-pop local 1
-label LABEL7 
-push local 1
-push constant 1
-add  
-pop pointer 1
-push that 0
-push constant 0
-eq  
-not  
-not  
-if-goto LABEL8 
-push local 1
-push constant 1
-add  
-pop pointer 1
-push that 0
-pop local 1
-goto LABEL7 
-label LABEL8 
-push local 1
-push constant 1
-add  
 push local 0
+push static 4
+add  
+push static 2
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 0
+pop static 2
+push constant 0
+return  

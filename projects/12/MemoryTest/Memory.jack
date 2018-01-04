@@ -13,13 +13,20 @@ class Memory {
     static Array heap;
     static Array freeList;
 
+    static int SIZE;
+    static int NEXT;
+
     /** Initializes the class. */
     function void init() {
         let ram = 0;
         let heap = 2048;
         let freeList = heap;
-        let heap[0] = 0;
-        let heap[1] = 14335;
+
+        let SIZE = 0;
+        let NEXT = 1;
+
+        let freeList[SIZE] = 14335;
+        let freeList[NEXT] = null;
         return;     
     }
 
@@ -41,22 +48,22 @@ class Memory {
         
         let curr = freeList;
         let prev = null;
-        while(curr[0] < size + 1) {
+        while(~(curr[SIZE] > size) & ~(curr[NEXT] = null)) {
             let prev = curr;
-            let curr = curr[1];
+            let curr = curr[NEXT];
         }
         
-        if (curr[0] = size) {
+        if (~(curr[SIZE] > (size + 1))) {
             if (prev = null) {
-                let freeList = curr[1];
+                let freeList = curr[NEXT];
             } else {
-                let prev[1] = curr[1];    
+                let prev[NEXT] = curr[NEXT];  
             }
-        } else {
-            let ans = curr + curr[0] - (size + 1) + 1;
-            let curr[0] = curr[0] - (size + 1);
-            let ans[-1] = size + 1;
+            let size = curr[SIZE] - 1;
         }
+        let curr[SIZE] = curr[SIZE] - (size + 1);
+        let ans = curr + curr[SIZE] + 1;
+        let ans[-1] = size + 1;
 
         return ans;
     }
@@ -65,14 +72,11 @@ class Memory {
      *  it available for future allocations. */
     function void deAlloc(Array o) {
         var Array segment;
-        var int curr;
 
         let segment = o - 1;
-        let segment[1] = null;
-        let curr = freeList;
-        while (~(curr[1] = null)) {
-            let curr = curr[1];
-        }
-        let curr[1] = segment;
+        let segment[SIZE] = o[-1];
+        let segment[NEXT] = freeList;
+        let freeList = segment;
+        return;
     }    
 }
