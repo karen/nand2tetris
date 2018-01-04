@@ -253,13 +253,28 @@ label LABEL14
 push constant 0
 return  
 function Screen.drawVertical 0
+push argument 1
+push argument 2
+gt  
+not  
+if-goto LABEL18 
+push argument 0
+push argument 2
+push argument 1
+call Screen.drawVertical 3
+pop temp 0
+push constant 0
+return  
+goto LABEL17 
+label LABEL18 
 label LABEL17 
+label LABEL19 
 push argument 1
 push argument 2
 gt  
 not  
 not  
-if-goto LABEL18 
+if-goto LABEL20 
 push argument 0
 push argument 1
 call Screen.drawPixel 2
@@ -268,18 +283,18 @@ push argument 1
 push constant 1
 add  
 pop argument 1
-goto LABEL17 
-label LABEL18 
+goto LABEL19 
+label LABEL20 
 push constant 0
 return  
 function Screen.drawHorizontal 0
-label LABEL19 
+label LABEL21 
 push argument 0
 push argument 1
 gt  
 not  
 not  
-if-goto LABEL20 
+if-goto LABEL22 
 push argument 0
 push argument 2
 call Screen.drawPixel 2
@@ -288,8 +303,8 @@ push argument 0
 push constant 1
 add  
 pop argument 0
-goto LABEL19 
-label LABEL20 
+goto LABEL21 
+label LABEL22 
 push constant 0
 return  
 function Screen.drawRectangle 1
@@ -297,7 +312,7 @@ push argument 0
 push argument 2
 gt  
 not  
-if-goto LABEL22 
+if-goto LABEL24 
 push argument 2
 push argument 3
 push argument 0
@@ -306,18 +321,18 @@ call Screen.drawRectangle 4
 pop temp 0
 push constant 0
 return  
-goto LABEL21 
-label LABEL22 
-label LABEL21 
+goto LABEL23 
+label LABEL24 
+label LABEL23 
 push argument 1
 pop local 0
-label LABEL23 
+label LABEL25 
 push local 0
 push argument 3
 gt  
 not  
 not  
-if-goto LABEL24 
+if-goto LABEL26 
 push argument 0
 push argument 2
 push local 0
@@ -327,8 +342,8 @@ push local 0
 push constant 1
 add  
 pop local 0
-goto LABEL23 
-label LABEL24 
+goto LABEL25 
+label LABEL26 
 push constant 0
 return  
 function Screen.drawCircle 4
@@ -342,13 +357,13 @@ pop local 2
 push argument 2
 neg  
 pop local 1
-label LABEL25 
+label LABEL27 
 push local 1
 push argument 2
 gt  
 not  
 not  
-if-goto LABEL26 
+if-goto LABEL28 
 push local 1
 push local 1
 call Math.multiply 2  
@@ -373,7 +388,7 @@ push local 1
 push constant 1
 add  
 pop local 1
-goto LABEL25 
-label LABEL26 
+goto LABEL27 
+label LABEL28 
 push constant 0
 return  

@@ -112,6 +112,11 @@ class Screen {
     }
 
     function void drawVertical(int x1, int y1, int y2) {
+        if (y1 > y2) {
+            do Screen.drawVertical(x1, y2, y1);
+            return;
+        }
+
         while (~(y1 > y2)) {
             do Screen.drawPixel(x1, y1);
             let y1 = y1 + 1;
