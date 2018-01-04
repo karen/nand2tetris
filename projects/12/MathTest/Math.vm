@@ -91,8 +91,9 @@ pop pointer 1
 push that 0
 push argument 0
 and  
-push constant 1
+push constant 0
 eq  
+not  
 return  
 function Math.divide 6
 push argument 0
@@ -120,31 +121,31 @@ goto LABEL9
 label LABEL10 
 label LABEL9 
 push local 1
-push constant 2
 push local 2
-call Math.multiply 2  
+push local 2
+add  
 call Math.divide 2
 pop local 0
 push local 1
-push constant 2
-sub  
 push local 0
-call Math.multiply 2  
+push local 0
+add  
 push local 2
 call Math.multiply 2  
+sub  
 push local 2
 lt  
 not  
 if-goto LABEL12 
-push constant 2
 push local 0
-call Math.multiply 2  
+push local 0
+add  
 pop local 3
 goto LABEL11 
 label LABEL12 
-push constant 2
 push local 0
-call Math.multiply 2  
+push local 0
+add  
 push constant 1
 add  
 pop local 3
@@ -175,21 +176,21 @@ push local 0
 push local 1
 sub  
 return  
-function Math.sqrt 3
-push constant 0
-pop local 0
+function Math.sqrt 4
 push constant 7
+pop local 0
+push constant 0
 pop local 1
 label LABEL15 
-push local 1
+push local 0
 push constant 0
 lt  
 not  
 not  
 if-goto LABEL16 
-push local 0
-push static 0
 push local 1
+push static 0
+push local 0
 add  
 pop pointer 1
 push that 0
@@ -198,11 +199,11 @@ pop local 2
 push local 2
 push local 2
 call Math.multiply 2  
-pop local 2
-push local 2
+pop local 3
+push local 3
 push constant 0
 gt  
-push local 2
+push local 3
 push argument 0
 gt  
 not  
@@ -210,17 +211,17 @@ and
 not  
 if-goto LABEL18 
 push local 2
-pop local 0
+pop local 1
 goto LABEL17 
 label LABEL18 
 label LABEL17 
-push local 1
+push local 0
 push constant 1
 sub  
-pop local 1
+pop local 0
 goto LABEL15 
 label LABEL16 
-push local 0
+push local 1
 return  
 function Math.max 0
 push argument 0
