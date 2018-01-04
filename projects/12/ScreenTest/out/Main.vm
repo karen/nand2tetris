@@ -1,4 +1,8 @@
 function Main.main 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
 push constant 0
 push constant 220
 push constant 511

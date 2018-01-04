@@ -28,6 +28,7 @@ class Screen {
         let i = 0;
         while (i < 8192) {
             let screen[i] = white;
+            let i = i + 1;
         }
         return;
     }
@@ -35,79 +36,83 @@ class Screen {
     /** Sets the current color, to be used for all subsequent drawXXX commands.
      *  Black is represented by true, white by false. */
     function void setColor(boolean b) {
-        if (b) {
-            let curColour = black;
-        } else {
-            let curColour = white;
-        }
+        let curColour = b;
         return;
     }
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
         var int address, value, rem, bit;
-        let address = 32 * y + x / 16;
-        let value = Memory.peek(16384 + address);
-        let rem = Math.mod(x, 16);
-        let bit = Math.powerOfTwo(rem);
-        let value = value | bit;
-        do Memory.poke(address, value);
+        
+        let address = (32 * y) + (x / 16);
+        let value = screen[address];
+
+        let bit = Math.powerOfTwo(x & 15);
+        
+        if (curColour) {
+            let value = value | bit;
+        } else {
+            let value = value & ~bit;
+        }
+        let screen[address] = value;
+        return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
         var int dx, dy, cx, cy, diff;
+        if (x1 > x2) {
+            do Screen.drawLine(x2, y2, x1, y1);
+            return;
+        }
+
         let dx = x1 - x2;
         let dy = y1 - y2;
+
         if (dx = 0) {
             do Screen.drawVertical(x1, y1, y2);
             return;
         }
+
         if (dy = 0) {
             do Screen.drawHorizontal(x1, x2, y1);
             return;
         }
+
         do Screen.drawDiagonal(x1, y1, x2, y2);
         return;
     }
 
     function void drawDiagonal(int x1, int y1, int x2, int y2) {
         var int dx, dy, yDir, a, b, diff;
-        if (x1 > x2) {
-            do Screen.drawDiagonal(x2, y2, x1, y1);
-            return;
-        }
 
-        if (y1 > y2) {
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+
+        if (dy < 0) {
             let yDir = -1;
         } else {
             let yDir = 1;
         }
 
-        let dx = x2 - x1;
-        let dy = y1 - y2;
-
         let a = 0;
         let b = 0;
         let diff = 0;
-        while (~(a > dx) & ((yDir = 1) & ~(b > dy) | (yDir = -1) & ~(b < dy))) {
+        while (~(a > dx) & ( ((yDir = 1) & ~(b > dy)) | ((yDir = -1) & ~(b < dy)) )) {
             do Screen.drawPixel(x1 + a, y1 + b);
-            if (diff < 0) {
+            if ( ((yDir = 1) & (diff < 0)) | ((yDir = -1) & (diff > 0)) ) {
                 let a = a + 1;
-                let diff = diff + dy;
+                let diff = diff + (dy);
             } else {
                 let b = b + yDir;
-                let diff = diff - (dx * yDir);
+                let diff = diff - (dx*yDir);
             }
         }
+        return;
     }
 
     function void drawVertical(int x1, int y1, int y2) {
-        if (y1 > y2) {
-            do Screen.drawVertical(x1, y2, y1);
-            return;
-        }
-        while (y1 < y2) {
+        while (~(y1 > y2)) {
             do Screen.drawPixel(x1, y1);
             let y1 = y1 + 1;
         }
@@ -115,11 +120,7 @@ class Screen {
     }
 
     function void drawHorizontal(int x1, int x2, int y1) {
-        if (x1 > x2) {
-            do Screen.drawHorizontal(x2, x1, y1);
-            return;
-        }
-        while (x1 < x2) {
+        while (~(x1 > x2)) {
             do Screen.drawPixel(x1, y1);
             let x1 = x1 + 1;
         }
@@ -130,6 +131,10 @@ class Screen {
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
         var int row;
+        if (x1 > x2) {
+            do Screen.drawRectangle(x2, y2, x1, y1);
+            return;
+        }
         let row = y1;
         while (~(row > y2)) {
             do Screen.drawHorizontal(x1, x2, row);
@@ -147,7 +152,7 @@ class Screen {
         while (~(dy > r)) {
             let dySq = dy * dy;
             let dx = Math.sqrt(rSq - dySq);
-            do Screen.drawLine(x - dx, y + dy, x + dx, y + dy);
+            do Screen.drawHorizontal(x - dx, x + dx, y + dy);
             let dy = dy + 1;
         }
         return;
