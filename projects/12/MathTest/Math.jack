@@ -93,7 +93,7 @@ class Math {
         var int q, p;
         let q = x / y;
         let p = q * y;
-        return q - p;
+        return x - p;
     }
 
     /** Returns the integer part of the square root of x. */

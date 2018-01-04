@@ -3,10 +3,22 @@ push constant 48
 pop static 0
 push constant 45
 pop static 1
+push constant 0
+return  
 function String.new 0
 push constant 3
 call Memory.alloc 1
 pop pointer 0
+push argument 0
+push constant 0
+eq  
+not  
+if-goto LABEL2 
+push constant 1
+pop argument 0
+goto LABEL1 
+label LABEL2 
+label LABEL1 
 push argument 0
 call Array.new 1
 pop this 0
@@ -30,21 +42,21 @@ pop pointer 0
 push this 2
 return  
 function String.charAt 0
-push argument 1
+push argument 0
 pop pointer 0
 push this 0
-push argument 0
+push argument 1
 add  
 pop pointer 1
 push that 0
 return  
 function String.setCharAt 0
-push argument 2
+push argument 0
 pop pointer 0
 push this 0
-push argument 0
-add  
 push argument 1
+add  
+push argument 2
 pop temp 0
 pop pointer 1
 push temp 0
@@ -52,25 +64,25 @@ pop that 0
 push constant 0
 return  
 function String.appendChar 0
-push argument 1
+push argument 0
 pop pointer 0
 push this 2
 push this 1
 lt  
 not  
-if-goto LABEL2 
+if-goto LABEL4 
 push pointer 0
 push this 2
-push argument 0
+push argument 1
 call String.setCharAt 3
 pop temp 0
 push this 2
 push constant 1
 add  
 pop this 2
-goto LABEL1 
-label LABEL2 
-label LABEL1 
+goto LABEL3 
+label LABEL4 
+label LABEL3 
 push pointer 0
 return  
 function String.eraseLastChar 0
@@ -80,14 +92,14 @@ push this 2
 push constant 0
 gt  
 not  
-if-goto LABEL4 
+if-goto LABEL6 
 push this 2
 push constant 1
 sub  
 pop this 2
-goto LABEL3 
-label LABEL4 
-label LABEL3 
+goto LABEL5 
+label LABEL6 
+label LABEL5 
 push constant 0
 return  
 function String.intValue 3
@@ -101,25 +113,31 @@ push that 0
 push static 1
 eq  
 not  
-if-goto LABEL6 
+if-goto LABEL8 
 push constant 1
 pop local 1
 push constant 1
 neg  
 pop local 2
-goto LABEL5 
-label LABEL6 
+goto LABEL7 
+label LABEL8 
 push constant 0
 pop local 1
 push constant 1
 pop local 2
-label LABEL5 
 label LABEL7 
+push constant 0
+pop local 0
+label LABEL9 
 push local 1
 push this 2
 lt  
+push pointer 0
+push local 1
+call String.isDigit 2
+and  
 not  
-if-goto LABEL8 
+if-goto LABEL10 
 push local 0
 push constant 10
 call Math.multiply 2  
@@ -128,69 +146,111 @@ push local 1
 add  
 pop pointer 1
 push that 0
-push static 0
-sub  
+call String.digit 1
 add  
 pop local 0
 push local 1
 push constant 1
 add  
 pop local 1
-goto LABEL7 
-label LABEL8 
+goto LABEL9 
+label LABEL10 
 push local 0
 push local 2
 call Math.multiply 2  
 return  
-function String.setInt 2
-push argument 1
-pop pointer 0
+function String.isDigit 0
 push argument 0
+pop pointer 0
+push pointer 0
+push argument 1
+call String.charAt 2
+push constant 47
+gt  
+push pointer 0
+push argument 1
+call String.charAt 2
+push constant 58
+lt  
+and  
+return  
+function String.setInt 0
+push argument 0
+pop pointer 0
+push constant 0
+pop this 2
+push argument 1
 push constant 0
 lt  
 not  
-if-goto LABEL10 
-push argument 0
-call Math.abs 1
-pop argument 0
+if-goto LABEL12 
+push argument 1
+push constant 1
+add  
+neg  
+push constant 1
+add  
+pop argument 1
 push pointer 0
 push static 1
 call String.appendChar 2
 pop temp 0
-goto LABEL9 
-label LABEL10 
-label LABEL9 
+goto LABEL11 
+label LABEL12 
+label LABEL11 
+push pointer 0
+push argument 1
+call String.setIntHelper 2
+pop temp 0
+push constant 0
+return  
+function String.setIntHelper 2
 push argument 0
+pop pointer 0
+push argument 1
+push argument 1
 push constant 10
-call Math.mod 2
+call Math.divide 2  
+push constant 10
+call Math.multiply 2  
+sub  
 pop local 0
-push static 0
 push local 0
-add  
+call String.chr 1
 pop local 1
-push argument 0
+push argument 1
 push constant 10
 lt  
 not  
-if-goto LABEL12 
+if-goto LABEL14 
 push pointer 0
 push local 1
 call String.appendChar 2
 pop temp 0
-goto LABEL11 
-label LABEL12 
+goto LABEL13 
+label LABEL14 
 push pointer 0
-push argument 0
+push argument 1
 push constant 10
 call Math.divide 2  
-call String.setInt 2
+call String.setIntHelper 2
 pop temp 0
 push pointer 0
 push local 1
 call String.appendChar 2
 pop temp 0
-label LABEL11 
+label LABEL13 
 push constant 0
+return  
+function String.chr 0
+push static 0
+push argument 0
+add  
+return  
+function String.digit 0
+push argument 0
+push static 0
+sub  
 return  
 function String.newLine 0
 push constant 128

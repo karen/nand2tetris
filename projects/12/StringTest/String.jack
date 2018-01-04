@@ -19,10 +19,14 @@ class String {
     function void init() {
         let zero = 48;
         let neg = 45;
+        return;
     }
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
+        if (maxLength = 0) {
+            let maxLength = 1;
+        }
         let data = Array.new(maxLength);
         let maxLen = maxLength;
         let curLen = 0;
@@ -79,33 +83,51 @@ class String {
             let i = 0;
             let sign = 1;
         }
-        while (i < curLen) {
-            let result = result * 10 + (data[i] - zero);
+        let result = 0;
+        while ((i < curLen) & isDigit(i)) {
+            let result = (result * 10) + String.digit(data[i]);
             let i = i + 1;
         }
         return result * sign;
     }
 
+    method boolean isDigit(int i) {
+        return (charAt(i) > 47) & (charAt(i) < 58);
+    }
+
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
-        var int digit;
-        var char c;
-
+        let curLen = 0;
         if (val < 0) {
-            let val = Math.abs(val);
+            let val = -(val + 1) + 1;
             do appendChar(neg);
         }
 
-        let digit = Math.mod(val, 10);
-        let c = zero + digit;
+        do setIntHelper(val);
+        return;
+    }
+
+    method void setIntHelper(int val) {
+        var int digit;
+        var char c;
+        let digit = val - ((val / 10) * 10);
+        let c = String.chr(digit);
 
         if (val < 10) {
             do appendChar(c);
         } else {
-            do setInt(val / 10);
+            do setIntHelper(val / 10);
             do appendChar(c);
         }
         return;
+    }
+
+    function char chr(int x) {
+        return zero + x;
+    }
+
+    function int digit(char x) {
+        return x - zero;
     }
 
     /** Returns the new line character. */

@@ -172,7 +172,7 @@ push local 0
 push argument 1
 call Math.multiply 2  
 pop local 1
-push local 0
+push argument 0
 push local 1
 sub  
 return  

@@ -3,30 +3,30 @@ push constant 0
 call String.new 1
 pop local 0
 push local 0
-call String.dispose 0
+call String.dispose 1
 pop temp 0
 push constant 6
 call String.new 1
 pop local 0
 push local 0
 push constant 97
-call String.appendChar 1
+call String.appendChar 2
 pop local 0
 push local 0
 push constant 98
-call String.appendChar 1
+call String.appendChar 2
 pop local 0
 push local 0
 push constant 99
-call String.appendChar 1
+call String.appendChar 2
 pop local 0
 push local 0
 push constant 100
-call String.appendChar 1
+call String.appendChar 2
 pop local 0
 push local 0
 push constant 101
-call String.appendChar 1
+call String.appendChar 2
 pop local 0
 push constant 16
 call String.new 1
@@ -74,7 +74,7 @@ call String.new 1
 pop local 1
 push local 1
 push constant 12345
-call String.setInt 1
+call String.setInt 2
 pop temp 0
 push constant 8
 call String.new 1
@@ -104,7 +104,7 @@ pop temp 0
 push local 1
 push constant 32767
 neg  
-call String.setInt 1
+call String.setInt 2
 pop temp 0
 push constant 8
 call String.new 1
@@ -152,7 +152,7 @@ call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 0
-call String.length 0
+call String.length 1
 call Output.printInt 1
 pop temp 0
 call Output.println 0
@@ -185,7 +185,7 @@ call Output.printString 1
 pop temp 0
 push local 0
 push constant 2
-call String.charAt 1
+call String.charAt 2
 call Output.printInt 1
 pop temp 0
 call Output.println 0
@@ -193,7 +193,7 @@ pop temp 0
 push local 0
 push constant 2
 push constant 45
-call String.setCharAt 2
+call String.setCharAt 3
 pop temp 0
 push constant 18
 call String.new 1
@@ -241,7 +241,7 @@ pop temp 0
 call Output.println 0
 pop temp 0
 push local 0
-call String.eraseLastChar 0
+call String.eraseLastChar 1
 pop temp 0
 push constant 15
 call String.new 1
@@ -316,7 +316,7 @@ call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 0
-call String.intValue 0
+call String.intValue 1
 call Output.printInt 1
 pop temp 0
 call Output.println 0
@@ -361,7 +361,7 @@ call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 0
-call String.intValue 0
+call String.intValue 1
 call Output.printInt 1
 pop temp 0
 call Output.println 0
@@ -460,10 +460,10 @@ pop temp 0
 call Output.println 0
 pop temp 0
 push local 1
-call String.dispose 0
+call String.dispose 1
 pop temp 0
 push local 0
-call String.dispose 0
+call String.dispose 1
 pop temp 0
 push constant 0
 return  
