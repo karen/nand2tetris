@@ -1,4 +1,6 @@
 function Keyboard.init 0
+push constant 0
+return  
 function Keyboard.keyPressed 0
 push constant 24576
 call Memory.peek 1
@@ -29,55 +31,46 @@ pop temp 0
 push local 0
 return  
 function Keyboard.readLine 2
-push local 0
+push argument 0
 call Output.printString 1
 pop temp 0
 push constant 64
 call String.new 1
 pop local 0
+call Keyboard.readChar 0
+pop local 1
 label LABEL5 
-push constant 1
-neg  
+push local 1
+call String.newLine 0
+eq  
+not  
 not  
 if-goto LABEL6 
-call Keyboard.readChar 0
-call String.newline 0
+push local 1
+call String.backSpace 0
 eq  
 not  
 if-goto LABEL8 
-call String.newline 0
-call Output.printChar 1
-pop temp 0
 push local 0
-return  
+call String.eraseLastChar 1
+pop temp 0
 goto LABEL7 
 label LABEL8 
-label LABEL7 
-call Keyboard.readChar 0
-call String.backspace 0
-eq  
-not  
-if-goto LABEL10 
-push local 0
-call String.eraseLastChar 0
-pop temp 0
-call Output.backSpace 0
-pop temp 0
-goto LABEL9 
-label LABEL10 
-call Keyboard.readChar 0
-pop local 1
 push local 0
 push local 1
-call String.appendChar 1
-pop local 0
-label LABEL9 
+call String.appendChar 2
+pop temp 0
+label LABEL7 
+call Keyboard.readChar 0
+pop local 1
 goto LABEL5 
 label LABEL6 
+push local 0
+return  
 function Keyboard.readInt 1
 push argument 0
 call Keyboard.readLine 1
 pop local 0
 push local 0
-call String.intValue 0
+call String.intValue 1
 return  

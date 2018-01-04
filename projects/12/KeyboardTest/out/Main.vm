@@ -614,31 +614,31 @@ call String.appendChar 2
 call Keyboard.readLine 1
 pop local 2
 push local 2
-call String.length 0
+call String.length 1
 push constant 4
 eq  
 not  
 if-goto LABEL16 
 push local 2
 push constant 0
-call String.charAt 1
+call String.charAt 2
 push constant 74
 eq  
 push local 2
 push constant 1
-call String.charAt 1
+call String.charAt 2
 push constant 65
 eq  
 and  
 push local 2
 push constant 2
-call String.charAt 1
+call String.charAt 2
 push constant 67
 eq  
 and  
 push local 2
 push constant 3
-call String.charAt 1
+call String.charAt 2
 push constant 75
 eq  
 and  
